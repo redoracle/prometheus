@@ -54,8 +54,8 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-      - ./prometheus/:/etc/prometheus/
-      - prometheus_data:/prometheus
+      - ./DATA/Prometheus/etc:/etc/prometheus
+      - ./DATA/Prometheus/data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -134,10 +134,14 @@ services:
     depends_on:
       - prometheus
     volumes:
-      - grafana_data:/var/lib/grafana
+      - ./DATA/Grafana/var/lib/grafana:/var/lib/grafana
+      - ./DATA/Grafana/conf:/usr/share/grafana/conf
+      - ./DATA/Grafana/etc/grafana:/etc/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     env_file:
       - ./grafana/config.monitoring
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-image-renderer,petrslavotinek-carpetplot-panel,michaeldmoore-annunciator-panel,alexandra-trackmap-panel,agenty-flowcharting-panel,aidanmountford-html-panel,pierosavi-imageit-panel,larona-epict-panel,mxswat-separator-panel,natel-influx-admin-panel,yesoreyeram-boomtheme-panel,grafana-kubernetes-app,paytm-kapacitor-datasource,ayoungprogrammer-finance-datasource,fzakaria-simple-annotations-datasource
     networks:
       - monitor-net
     user: "472"
@@ -146,7 +150,7 @@ services:
         constraints:
           - node.role==manager
       labels:
-        -  "traefik.frontend.rule=Host:grafana.localhost"
+        - "traefik.frontend.rule=Host:grafana.localhost"
         - "traefik.backend=grafana"
         - "traefik.port=3000"
         - "traefik.docker.network=traefik"
